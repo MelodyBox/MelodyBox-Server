@@ -36,11 +36,11 @@ const SearchQuery = z.object({
 
 export type SearchData = z.infer<typeof SearchQuery>;
 export function validSearchRequest(req: ApiRequest<SearchData>, res: Response) {
-  const result = SearchQuery.safeParse(req.query);
-  if (!result.success) {
-    return ErrorRes(res, { message: ZodFirstError(result) });
+  const paramResult = SearchQuery.safeParse(req.query);
+  if (!paramResult.success) {
+    return ErrorRes(res, { message: ZodFirstError(paramResult) });
   }
-  req["apiData"] = result.data;
+  req["apiData"] = paramResult.data;
   return SuccessRes(res, { data: "Hi" });
 }
 
