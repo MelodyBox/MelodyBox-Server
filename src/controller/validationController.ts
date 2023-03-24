@@ -74,8 +74,8 @@ const LyricsProvider = z.object({
     .default("youtube"),
 });
 
-type LyricsData = Expand<z.infer<typeof songIDSchema> & z.infer<typeof LyricsProvider>>;
-export function validLyricsRequest(req: ApiRequest<LyricsData>, res: Response) {
+export type SongData = Expand<z.infer<typeof songIDSchema> & z.infer<typeof LyricsProvider>>;
+export function validSongRequest(req: ApiRequest<SongData>, res: Response) {
   const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
     return ErrorRes(res, { message: ZodFirstError(paramResult) });
