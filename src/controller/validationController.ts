@@ -30,7 +30,7 @@ export function validSearchRequest(req: Request, res: Response) {
   return SuccessRes(res, { data: "Hi" });
 }
 
-const InfoParam = z.object({
+const songIDSchema = z.object({
   songID: z
     .string()
     .trim()
@@ -38,9 +38,34 @@ const InfoParam = z.object({
 });
 
 export function validInfoRequest(req: Request, res: Response) {
-  const paramResult = InfoParam.safeParse(req.params);
+  const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
     return ErrorRes(res, { message: paramResult.error.errors[0].message });
+  }
+  return SuccessRes(res, { data: "Hi" });
+}
+
+const LyricsProvider = z.object({
+  provider: z
+    .enum(["youtube", "genius"], {
+      errorMap: (val) => {
+        const rec = (val as { received: string }).received;
+        return {
+          message: `The lyrics provider value should be one of these 'youtube', 'genius' but received '${rec}'`,
+        };
+      },
+    })
+    .default("youtube"),
+});
+
+export function validLyricsRequest(req: Request, res: Response) {
+  const paramResult = songIDSchema.safeParse(req.params);
+  if (!paramResult.success) {
+    return ErrorRes(res, { message: paramResult.error.errors[0].message });
+  }
+  const queryResult = LyricsProvider.safeParse(req.query);
+  if (!queryResult.success) {
+    return ErrorRes(res, { message: queryResult.error.errors[0].message });
   }
   return SuccessRes(res, { data: "Hi" });
 }
