@@ -24,6 +24,7 @@
   "homepage": "https://github.com/MelodyBox/MelodyBox-Server#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "ytdl-core": "^4.11.2",
     "zod": "^3.21.4"
   },
   "devDependencies": {
