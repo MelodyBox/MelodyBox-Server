@@ -4,7 +4,12 @@
   "private": "true",
   "description": "The server code for the MelodyBox-Client",
   "main": "src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "start": "node dist/index.js",
+    "serve": "npm run build && npm run start"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MelodyBox/MelodyBox-Server.git"
@@ -14,5 +19,15 @@
   "bugs": {
     "url": "https://github.com/MelodyBox/MelodyBox-Server/issues"
   },
-  "homepage": "https://github.com/MelodyBox/MelodyBox-Server#readme"
+  "homepage": "https://github.com/MelodyBox/MelodyBox-Server#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.15.7",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.2"
+  }
 }
