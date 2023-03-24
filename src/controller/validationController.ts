@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import { SuccessRes, ErrorRes } from "../utils/responseTypes";
+import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import ytdl from "ytdl-core";
 
@@ -8,6 +7,7 @@ export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 
 export interface ApiRequest<T> extends Request {
   apiData?: T;
+  apiError?: string;
 }
 
 /**
@@ -35,13 +35,14 @@ const SearchQuery = z.object({
 });
 
 export type SearchData = z.infer<typeof SearchQuery>;
-export function validSearchRequest(req: ApiRequest<SearchData>, res: Response) {
+export function validSearchRequest(req: ApiRequest<SearchData>, _: Response, next: NextFunction) {
   const paramResult = SearchQuery.safeParse(req.query);
   if (!paramResult.success) {
-    return ErrorRes(res, { message: ZodFirstError(paramResult) });
+    req["apiError"] = ZodFirstError(paramResult);
+  } else {
+    req["apiData"] = paramResult.data;
   }
-  req["apiData"] = paramResult.data;
-  return SuccessRes(res, { data: "Hi" });
+  next();
 }
 
 const songIDSchema = z.object({
@@ -52,13 +53,14 @@ const songIDSchema = z.object({
 });
 
 export type InfoData = z.infer<typeof songIDSchema>;
-export function validInfoRequest(req: ApiRequest<InfoData>, res: Response) {
+export function validInfoRequest(req: ApiRequest<InfoData>, _: Response, next: NextFunction) {
   const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
-    return ErrorRes(res, { message: ZodFirstError(paramResult) });
+    req["apiError"] = ZodFirstError(paramResult);
+  } else {
+    req["apiData"] = paramResult.data;
   }
-  req["apiData"] = paramResult.data;
-  return SuccessRes(res, { data: "Hi" });
+  next();
 }
 
 const LyricsProvider = z.object({
@@ -75,18 +77,20 @@ const LyricsProvider = z.object({
 });
 
 export type SongData = Expand<z.infer<typeof songIDSchema> & z.infer<typeof LyricsProvider>>;
-export function validSongRequest(req: ApiRequest<SongData>, res: Response) {
+export function validSongRequest(req: ApiRequest<SongData>, _: Response, next: NextFunction) {
   const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
-    return ErrorRes(res, { message: ZodFirstError(paramResult) });
+    req["apiError"] = ZodFirstError(paramResult);
+  } else {
+    const queryResult = LyricsProvider.safeParse(req.query);
+    if (!queryResult.success) {
+      req["apiError"] = ZodFirstError(queryResult);
+    } else {
+      req["apiData"] = {
+        songID: paramResult.data.songID,
+        provider: queryResult.data.provider,
+      };
+    }
   }
-  const queryResult = LyricsProvider.safeParse(req.query);
-  if (!queryResult.success) {
-    return ErrorRes(res, { message: ZodFirstError(queryResult) });
-  }
-  req["apiData"] = {
-    songID: paramResult.data.songID,
-    provider: queryResult.data.provider,
-  };
-  return SuccessRes(res, { data: "Hi" });
+  next();
 }
