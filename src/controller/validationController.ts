@@ -1,14 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { ApiRequest } from "../routers/api";
+import { Response, NextFunction } from "express";
 import { z } from "zod";
 import ytdl from "ytdl-core";
 
 // Helper Type
 export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
-
-export interface ApiRequest<T> extends Request {
-  apiData?: T;
-  apiError?: string;
-}
 
 /**
  * Returns the first error message in the array of ZodError
@@ -38,10 +34,10 @@ export type SearchData = z.infer<typeof SearchQuery>;
 export function validSearchRequest(req: ApiRequest<SearchData>, _: Response, next: NextFunction) {
   const paramResult = SearchQuery.safeParse(req.query);
   if (!paramResult.success) {
-    req["apiError"] = ZodFirstError(paramResult);
-  } else {
-    req["apiData"] = paramResult.data;
+    req["apiResult"] = { success: false, error: ZodFirstError(paramResult) };
+    return next();
   }
+  req["apiResult"] = { success: true, data: paramResult.data };
   next();
 }
 
@@ -56,10 +52,10 @@ export type InfoData = z.infer<typeof songIDSchema>;
 export function validInfoRequest(req: ApiRequest<InfoData>, _: Response, next: NextFunction) {
   const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
-    req["apiError"] = ZodFirstError(paramResult);
-  } else {
-    req["apiData"] = paramResult.data;
+    req["apiResult"] = { success: false, error: ZodFirstError(paramResult) };
+    return next();
   }
+  req["apiResult"] = { success: true, data: paramResult.data };
   next();
 }
 
@@ -80,17 +76,20 @@ export type SongData = Expand<z.infer<typeof songIDSchema> & z.infer<typeof Lyri
 export function validSongRequest(req: ApiRequest<SongData>, _: Response, next: NextFunction) {
   const paramResult = songIDSchema.safeParse(req.params);
   if (!paramResult.success) {
-    req["apiError"] = ZodFirstError(paramResult);
-  } else {
-    const queryResult = LyricsProvider.safeParse(req.query);
-    if (!queryResult.success) {
-      req["apiError"] = ZodFirstError(queryResult);
-    } else {
-      req["apiData"] = {
-        songID: paramResult.data.songID,
-        provider: queryResult.data.provider,
-      };
-    }
+    req["apiResult"] = { success: false, error: ZodFirstError(paramResult) };
+    return next();
   }
+  const queryResult = LyricsProvider.safeParse(req.query);
+  if (!queryResult.success) {
+    req["apiResult"] = { success: false, error: ZodFirstError(queryResult) };
+    return next();
+  }
+  req["apiResult"] = {
+    success: true,
+    data: {
+      songID: paramResult.data.songID,
+      provider: queryResult.data.provider,
+    },
+  };
   next();
 }
