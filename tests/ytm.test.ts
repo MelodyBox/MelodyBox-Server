@@ -137,4 +137,11 @@ describe("Youtube Music Client Tests", () => {
     results = await ytm.getArtist("UCLZ7tlKC06ResyDmEStSrOw");
     expect(results.length).toBeGreaterThanOrEqual(11);
   });
+
+  test("Get Artist Albums", async () => {
+    expect.assertions(1);
+    const artist = await ytm.getArtist("UCAeLFBCQS7FvI8PvBrWvSBg");
+    const results = await ytm.getArtistAlbums(artist["albums"]["browseId"], artist["albums"]["params"]);
+    expect(results.length).toBeGreaterThan(0);
+  });
 });
