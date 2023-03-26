@@ -120,4 +120,21 @@ describe("Youtube Music Client Tests", () => {
     });
     expect(results.length).toBeGreaterThanOrEqual(1);
   });
+
+  test("Get Artist", async () => {
+    expect.assertions(2);
+    let results;
+    results = await ytm.getArtist("MPLAUCmMUZbaYdNH0bEd1PAlAqsA");
+    expect(results.length).toBe(14);
+
+    // test correctness of related artists
+    const arrayEq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const related = results["related"]["results"];
+    const t = related.filter((x) => arrayEq(Object.keys(x), ["browseId", "subscribers", "title", "thumbnails"]));
+    expect(t.length).toBe(related.length);
+
+    // no album year
+    results = await ytm.getArtist("UCLZ7tlKC06ResyDmEStSrOw");
+    expect(results.length).toBeGreaterThanOrEqual(11);
+  });
 });
