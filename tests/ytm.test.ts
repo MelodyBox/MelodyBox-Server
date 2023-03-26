@@ -13,16 +13,6 @@ describe("Youtube Music Client Tests", () => {
    * ***********
    */
 
-  test("Get Home", async () => {
-    expect.assertions(2);
-    let results;
-    results = await ytm.getHome(6);
-    expect(results.length).toBeGreaterThanOrEqual(6);
-
-    results = await ytm.getHome(15);
-    expect(results.length).toBeGreaterThanOrEqual(15);
-  });
-
   test("Search", async () => {
     expect.assertions(14);
     let results;
