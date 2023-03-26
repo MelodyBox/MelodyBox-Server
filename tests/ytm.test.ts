@@ -195,11 +195,22 @@ describe("Youtube Music Client Tests", () => {
   });
 
   test("Get Lyrics", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
     const playlist = await ytm.getWatchPlaylist(SAMPLE_VIDEO);
     const lyricsSong = await ytm.getLyrics(playlist["lyrics"]);
     expect(lyricsSong["lyrics"]).toBeDefined();
     expect(lyricsSong["source"]).toBeDefined();
     // Private Song Check not implemented
+  });
+
+  /*************
+   * * WATCH
+   * ***********
+   */
+
+  test("Get Watch Playlist", async () => {
+    expect.assertions(1);
+    const playlist = await ytm.getWatchPlaylist("OLAK5uy_lKgoGvlrWhX0EIPavQUXxyPed8Cj38AWc", true);
+    expect(playlist["tracks"]).toHaveLength(12);
   });
 });
