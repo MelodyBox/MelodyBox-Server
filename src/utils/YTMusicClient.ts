@@ -1,24 +1,38 @@
+import { interpreter as py, PyModule, PyObject } from "node-calls-python";
+import { SearchOptions, SearchResult } from "./search";
+import type { SearchParams } from "./search";
 import { z } from "zod";
 
-// Searchs
-const SearchOptions = z.object({
-  query: z.string().min(1),
-  filter: z.string().optional(),
-  scope: z.string().optional(),
-  limit: z.number().default(20),
-  ignore_spelling: z.boolean().default(false),
-});
-type SearchOptions = z.infer<typeof SearchOptions>;
-const SearchParams = SearchOptions.partial().required({ query: true });
-type SearchParams = z.infer<typeof SearchParams>;
-
 export class YTMusicClient {
+  #pyMod: PyModule;
+  #pyYT: PyObject;
+
   constructor() {
-    void 0;
+    this.#pyMod = py.importSync("src/utils/ytmusicconnect.py");
+    this.#pyYT = py.createSync(this.#pyMod, "YTMusic");
   }
 
-  async search(options: SearchParams) {
-    const safeOptions = SearchOptions.parse(options);
-    console.log(safeOptions);
+  async search(options: SearchParams): Promise<SearchResult[]> {
+    return new Promise((resolve, reject) => {
+      const safeOptions = SearchOptions.parse(options);
+      try {
+        const pythonResult = py.callSync(
+          this.#pyYT,
+          "search",
+          safeOptions.query,
+          safeOptions.filter,
+          safeOptions.scope,
+          safeOptions.limit,
+          safeOptions.ignore_spelling
+        );
+        const safeResult = z.array(SearchResult).safeParse(pythonResult);
+        if (!safeResult.success) {
+          throw new Error("Couldn't verify search result from python");
+        }
+        resolve(safeResult.data);
+      } catch (err) {
+        reject((err as Error).message);
+      }
+    });
   }
 }
