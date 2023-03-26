@@ -82,4 +82,42 @@ describe("Youtube Music Client Tests", () => {
     const results = await ytm.search({ query: "audiomachine", scope: "uploads", limit: 40 });
     expect(results.length).toBeGreaterThan(20);
   });
+
+  test("Search Library", async () => {
+    expect.assertions(5);
+    let results;
+    results = await ytm.search({ query: "garrix", scope: "library" });
+    expect(results.length).toBeGreaterThan(5);
+
+    results = await ytm.search({
+      query: "bergersen",
+      filter: "songs",
+      scope: "library",
+      limit: 40,
+    });
+    expect(results.length).toBeGreaterThan(10);
+
+    results = await ytm.search({
+      query: "garrix",
+      filter: "albums",
+      scope: "library",
+      limit: 40,
+    });
+    expect(results.length).toBeGreaterThanOrEqual(4);
+
+    results = await ytm.search({
+      query: "garrix",
+      filter: "artists",
+      scope: "library",
+      limit: 40,
+    });
+    expect(results.length).toBeGreaterThanOrEqual(1);
+
+    results = await ytm.search({
+      query: "garrix",
+      filter: "playlists",
+      scope: "library",
+    });
+    expect(results.length).toBeGreaterThanOrEqual(1);
+  });
 });
