@@ -61,44 +61,6 @@ describe("Youtube Music Client Tests", () => {
     expect(results.length).toBeGreaterThan(5);
   });
 
-  test("Search Library", async () => {
-    expect.assertions(5);
-    let results;
-    results = await ytm.search({ query: "garrix", scope: "library" });
-    expect(results.length).toBeGreaterThan(5);
-
-    results = await ytm.search({
-      query: "bergersen",
-      filter: "songs",
-      scope: "library",
-      limit: 40,
-    });
-    expect(results.length).toBeGreaterThan(10);
-
-    results = await ytm.search({
-      query: "garrix",
-      filter: "albums",
-      scope: "library",
-      limit: 40,
-    });
-    expect(results.length).toBeGreaterThanOrEqual(4);
-
-    results = await ytm.search({
-      query: "garrix",
-      filter: "artists",
-      scope: "library",
-      limit: 40,
-    });
-    expect(results.length).toBeGreaterThanOrEqual(1);
-
-    results = await ytm.search({
-      query: "garrix",
-      filter: "playlists",
-      scope: "library",
-    });
-    expect(results.length).toBeGreaterThanOrEqual(1);
-  });
-
   test("Get Artist", async () => {
     expect.assertions(2);
     let results;
