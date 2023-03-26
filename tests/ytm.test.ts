@@ -21,7 +21,7 @@ describe("Youtube Music Client Tests", () => {
     await expect(ytm.search({ query, filter: "song" })).rejects.toMatch("error");
     await expect(ytm.search({ query, scope: "upload" })).rejects.toMatch("error");
 
-    results = await ytm.search("l1qwkfkah2l1qwkfkah2");
+    results = await ytm.search({ query: "l1qwkfkah2l1qwkfkah2" });
     expect(results.length).toBeLessThanOrEqual(2);
 
     const queries = ["taylor swift", "taylor swift blank space", "taylor swift fearless"];
