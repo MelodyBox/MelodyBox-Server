@@ -69,6 +69,7 @@ describe("Youtube Music Client Tests", () => {
   });
 
   test("Search Uploads", async () => {
+    expect.assertions(2);
     await expect(
       ytm.search({
         query: "audiomachine",
