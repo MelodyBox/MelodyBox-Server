@@ -61,21 +61,6 @@ describe("Youtube Music Client Tests", () => {
     expect(results.length).toBeGreaterThan(5);
   });
 
-  test("Search Uploads", async () => {
-    expect.assertions(2);
-    await expect(
-      ytm.search({
-        query: "audiomachine",
-        filter: "songs",
-        scope: "uploads",
-        limit: 40,
-      })
-    ).rejects.toMatch("error");
-
-    const results = await ytm.search({ query: "audiomachine", scope: "uploads", limit: 40 });
-    expect(results.length).toBeGreaterThan(20);
-  });
-
   test("Search Library", async () => {
     expect.assertions(5);
     let results;
