@@ -174,4 +174,16 @@ describe("Youtube Music Client Tests", () => {
     const browse_id = await ytm.getAlbumBrowseId("OLAK5uy_nMr9h2VlS-2PULNz3M3XVXQj_P3C2bqaY");
     expect(browse_id).toBe(SAMPLE_ALBUM);
   });
+
+  test("Get Album", async () => {
+    expect.assertions(5);
+    let results;
+    results = await ytm.getAlbum(SAMPLE_ALBUM);
+    expect(results.length).toBeGreaterThanOrEqual(9);
+    expect(results["tracks"][0]["isExplicit"]).toBeTruthy();
+    expect(results["tracks"][0]).toHaveProperty("feedbackTokens");
+    expect(results["other_versions"]).toHaveLength(2);
+    results = await ytm.getAlbum("MPREb_BQZvl3BFGay");
+    expect(results["tracks"]).toHaveLength(7);
+  });
 });
