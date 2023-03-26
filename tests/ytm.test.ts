@@ -151,4 +151,18 @@ describe("Youtube Music Client Tests", () => {
     const results = await ytm.getArtistAlbums(artist["singles"]["browseId"], artist["singles"]["params"]);
     expect(results.length).toBeGreaterThan(0);
   });
+
+  test("Get User", async () => {
+    expect.assertions(1);
+    const results = await ytm.getUser("UC44hbeRoCZVVMVg5z0FfIww");
+    expect(results.length).toBe(3);
+  });
+
+  test("Get User Playlists", async () => {
+    expect.assertions(1);
+    let results;
+    results = await ytm.getUser("UCPVhZsC2od1xjGhgEc2NEPQ");
+    results = await ytm.getUserPlaylists("UCPVhZsC2od1xjGhgEc2NEPQ", results["playlists"]["params"]);
+    expect(results.length).toBeGreaterThan(100);
+  });
 });
