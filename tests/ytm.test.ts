@@ -67,4 +67,18 @@ describe("Youtube Music Client Tests", () => {
     results = await ytm.search({ query: "hip hop", filter: "featured_playlists" });
     expect(results.length).toBeGreaterThan(5);
   });
+
+  test("Search Uploads", async () => {
+    await expect(
+      ytm.search({
+        query: "audiomachine",
+        filter: "songs",
+        scope: "uploads",
+        limit: 40,
+      })
+    ).rejects.toMatch("error");
+
+    const results = await ytm.search({ query: "audiomachine", scope: "uploads", limit: 40 });
+    expect(results.length).toBeGreaterThan(20);
+  });
 });
