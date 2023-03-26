@@ -186,4 +186,20 @@ describe("Youtube Music Client Tests", () => {
     results = await ytm.getAlbum("MPREb_BQZvl3BFGay");
     expect(results["tracks"]).toHaveLength(7);
   });
+
+  test("Get Song", async () => {
+    expect.assertions(1);
+    // Private Song Check not implemented
+    const song = await ytm.getSong(SAMPLE_VIDEO);
+    expect(song["streamingData"]["adaptiveFormats"].length).toBeGreaterThanOrEqual(10);
+  });
+
+  test("Get Lyrics", async () => {
+    expect.assertions(1);
+    const playlist = await ytm.getWatchPlaylist(SAMPLE_VIDEO);
+    const lyricsSong = await ytm.getLyrics(playlist["lyrics"]);
+    expect(lyricsSong["lyrics"]).toBeDefined();
+    expect(lyricsSong["source"]).toBeDefined();
+    // Private Song Check not implemented
+  });
 });
