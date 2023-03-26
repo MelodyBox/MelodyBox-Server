@@ -3,6 +3,9 @@ import { describe, expect, test } from "@jest/globals";
 import { YTMusicClient } from "../src/utils/YTMusicClient";
 
 const ytm = new YTMusicClient();
+const SAMPLE_ALBUM = "MPREb_4pL8gzRtw1p"; // Eminem - Revival
+const SAMPLE_VIDEO = "hpSrLjc5SMs"; // Oasis - Wonderwall
+const SAMPLE_PLAYLIST = "PL6bPxvf5dW5clc3y9wAoslzqUrmkZ5c-u"; // very large playlist
 
 describe("Youtube Music Client Tests", () => {
   /*************
@@ -164,5 +167,11 @@ describe("Youtube Music Client Tests", () => {
     results = await ytm.getUser("UCPVhZsC2od1xjGhgEc2NEPQ");
     results = await ytm.getUserPlaylists("UCPVhZsC2od1xjGhgEc2NEPQ", results["playlists"]["params"]);
     expect(results.length).toBeGreaterThan(100);
+  });
+
+  test("Get Album BrowseId", async () => {
+    expect.assertions(1);
+    const browse_id = await ytm.getAlbumBrowseId("OLAK5uy_nMr9h2VlS-2PULNz3M3XVXQj_P3C2bqaY");
+    expect(browse_id).toBe(SAMPLE_ALBUM);
   });
 });
