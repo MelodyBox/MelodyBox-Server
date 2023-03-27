@@ -15,12 +15,13 @@ const ytm = new YTMusicClient();
 async function main() {
   try {
     const results = await ytm.search({
-      query: "edm playlist",
+      query: "Never Gonna Give You Up",
       scope: "uploads",
+      filter: "songs",
     });
-    if (results.length) console.log(results);
-  } catch {
-    console.log("err");
+    console.log("Result:", results);
+  } catch (e) {
+    console.log((e as Error).message);
   }
 }
 

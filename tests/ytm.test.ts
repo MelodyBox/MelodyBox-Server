@@ -14,7 +14,7 @@ describe("Youtube Music Client Tests", () => {
    */
 
   test("Search", async () => {
-    expect.assertions(14);
+    expect.assertions(15);
     let results;
 
     const query = "edm playlist";
@@ -36,6 +36,14 @@ describe("Youtube Music Client Tests", () => {
         ignore_spelling: true,
       })
     ).rejects.toThrowError(/verified/i);
+
+    await expect(
+      ytm.search({
+        query: "Never Gonna Give You Up",
+        scope: "uploads",
+        filter: "songs",
+      })
+    ).rejects.toThrowError(/no filter/i);
 
     results = await ytm.search({ query, filter: "songs" });
     expect(results.length).toBeGreaterThan(10);
