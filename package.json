@@ -5,6 +5,7 @@
   "description": "The server code for the MelodyBox-Client",
   "main": "src/index.ts",
   "scripts": {
+    "preinstall": "pip install -r requirements.txt",
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "start": "node dist/index.js",
