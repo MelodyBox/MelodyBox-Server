@@ -1,6 +1,6 @@
 // Test taken from https://github.com/sigma67/ytmusicapi/blob/master/tests/test.py
 import { describe, expect, test } from "@jest/globals";
-import { YTMusicClient } from "../src/utils/YTMusicClient/YTMusicClient";
+import YTMusicClient from "../src/utils/YTMusicClient";
 
 const ytm = new YTMusicClient();
 // const SAMPLE_ALBUM = "MPREb_4pL8gzRtw1p"; // Eminem - Revival

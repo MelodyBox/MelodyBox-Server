@@ -9,7 +9,7 @@
 
 // export const expressApp = app;
 
-import { YTMusicClient } from "./utils/YTMusicClient/YTMusicClient";
+import YTMusicClient from "./utils/YTMusicClient";
 const ytm = new YTMusicClient();
 
 async function main() {
