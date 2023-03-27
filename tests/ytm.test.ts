@@ -3,8 +3,8 @@ import { describe, expect, test } from "@jest/globals";
 import YTMusicClient from "../src/utils/YTMusicClient";
 
 const ytm = new YTMusicClient();
+const SAMPLE_SONG = "u5uSlUKBEDc"; // TiK ToK - Ke$ha
 // const SAMPLE_ALBUM = "MPREb_4pL8gzRtw1p"; // Eminem - Revival
-// const SAMPLE_VIDEO = "hpSrLjc5SMs"; // Oasis - Wonderwall
 // const SAMPLE_PLAYLIST = "PL6bPxvf5dW5clc3y9wAoslzqUrmkZ5c-u"; // very large playlist
 
 describe("Youtube Music Client Tests", () => {
@@ -156,7 +156,7 @@ describe("Youtube Music Client Tests", () => {
 
   test("Get Watch Playlist", async () => {
     expect.assertions(1);
-    const playlist = await ytm.getWatchPlaylist("HoBGWhapaho");
+    const playlist = await ytm.getWatchPlaylist(SAMPLE_SONG);
     expect(playlist["tracks"]).toHaveLength(25);
   });
 });
