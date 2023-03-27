@@ -26,7 +26,7 @@ import { GConstructor, Mixin } from "./mixin.helper";
 export type WatchMixin = Mixin<typeof WatchMixin>;
 
 export function WatchMixin<TBase extends GConstructor<_YTMusic>>(Base: TBase) {
-  return class Search extends Base {
+  return class Watch extends Base {
     async getWatchPlaylist(videoId: string): Promise<WatchResult> {
       return new Promise((resolve, reject) => {
         const pythonResult = this.pythonCall("get_watch_playlist", videoId);
