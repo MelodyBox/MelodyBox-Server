@@ -149,14 +149,14 @@ describe("Youtube Music Client Tests", () => {
   //   // Private Song Check not implemented
   // });
 
-  // /*************
-  //  * * WATCH
-  //  * ***********
-  //  */
+  /*************
+   * * WATCH
+   * ***********
+   */
 
-  // test("Get Watch Playlist", async () => {
-  //   expect.assertions(1);
-  //   const playlist = await ytm.getWatchPlaylist("OLAK5uy_lKgoGvlrWhX0EIPavQUXxyPed8Cj38AWc", true);
-  //   expect(playlist["tracks"]).toHaveLength(12);
-  // });
+  test("Get Watch Playlist", async () => {
+    expect.assertions(1);
+    const playlist = await ytm.getWatchPlaylist("OLAK5uy_lKgoGvlrWhX0EIPavQUXxyPed8Cj38AWc", true);
+    expect(playlist["tracks"]).toHaveLength(12);
+  });
 });
