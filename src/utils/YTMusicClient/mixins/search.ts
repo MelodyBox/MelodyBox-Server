@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Artists, Thumbs } from "./common";
 
 export const Filter = z.enum([
   "songs",
@@ -26,9 +27,6 @@ export const SearchOptions = z.object({
 export type SearchOptions = z.infer<typeof SearchOptions>;
 export const SearchParams = SearchOptions.partial().required({ query: true });
 export type SearchParams = z.infer<typeof SearchParams>;
-
-const Artists = z.array(z.object({ name: z.string().optional(), id: z.string().optional() }));
-const Thumbs = z.array(z.object({ url: z.string(), width: z.number(), height: z.number() }));
 
 const SongResult = z.object({
   category: z.literal("Songs"),
