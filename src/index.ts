@@ -14,14 +14,10 @@ const ytm = new YTMusicClient();
 
 async function main() {
   try {
-    const results = await ytm.search({
-      query: "Never Gonna Give You Up",
-      scope: "uploads",
-      filter: "songs",
-    });
-    console.log("Result:", results);
-  } catch (e) {
-    console.log((e as Error).message);
+    const res = await ytm.getWatchPlaylist("HoBGWhapaho");
+    console.log("res", res.tracks.length);
+  } catch {
+    console.log("err");
   }
 }
 
