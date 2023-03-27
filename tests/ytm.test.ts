@@ -1,4 +1,5 @@
-// Test taken from https://github.com/sigma67/ytmusicapi/blob/master/tests/test.py
+// Tests taken from https://github.com/sigma67/ytmusicapi/blob/master/tests/test.py
+// with some modifications
 import { describe, expect, test } from "@jest/globals";
 import YTMusicClient from "../src/utils/YTMusicClient";
 
