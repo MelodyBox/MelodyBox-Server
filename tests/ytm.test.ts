@@ -19,7 +19,7 @@ describe("Youtube Music Client Tests", () => {
 
     const query = "edm playlist";
     await expect(ytm.search({ query, filter: "songs" })).resolves;
-    await expect(ytm.search({ query, scope: "uploads" })).rejects.toContain("Unauthorized");
+    await expect(ytm.search({ query, scope: "uploads" })).rejects.toThrowError(/unauthorized/i);
 
     results = await ytm.search({ query: "l1qwkfkah2l1qwkfkah2" });
     expect(results.length).toBeLessThanOrEqual(2);
@@ -35,7 +35,7 @@ describe("Youtube Music Client Tests", () => {
         query: "Martin Stig Andersen - Deteriation",
         ignore_spelling: true,
       })
-    ).rejects.toContain("Couldn't verify");
+    ).rejects.toThrowError(/verified/i);
 
     results = await ytm.search({ query, filter: "songs" });
     expect(results.length).toBeGreaterThan(10);
