@@ -4,8 +4,6 @@ import YTMusicClient from "../src/utils/YTMusicClient";
 
 const ytm = new YTMusicClient();
 const SAMPLE_SONG = "u5uSlUKBEDc"; // TiK ToK - Ke$ha
-// const SAMPLE_ALBUM = "MPREb_4pL8gzRtw1p"; // Eminem - Revival
-// const SAMPLE_PLAYLIST = "PL6bPxvf5dW5clc3y9wAoslzqUrmkZ5c-u"; // very large playlist
 
 describe("Youtube Music Client Tests", () => {
   /*************
@@ -86,59 +84,6 @@ describe("Youtube Music Client Tests", () => {
     results = await ytm.getArtist("UCCNjeM2kdvErAtTQ-va5q4g");
     expect(results["albums"]["results"].length).toBeGreaterThanOrEqual(2);
   });
-
-  // test("Get Artist Albums", async () => {
-  //   expect.assertions(1);
-  //   const artist = await ytm.getArtist("UCAeLFBCQS7FvI8PvBrWvSBg");
-  //   const results = await ytm.getArtistAlbums(artist["albums"]["browseId"], artist["albums"]["params"]);
-  //   expect(results.length).toBeGreaterThan(0);
-  // });
-
-  // test("Get Artist Singles", async () => {
-  //   expect.assertions(1);
-  //   const artist = await ytm.getArtist("UCAeLFBCQS7FvI8PvBrWvSBg");
-  //   const results = await ytm.getArtistAlbums(artist["singles"]["browseId"], artist["singles"]["params"]);
-  //   expect(results.length).toBeGreaterThan(0);
-  // });
-
-  // test("Get User", async () => {
-  //   expect.assertions(1);
-  //   const results = await ytm.getUser("UC44hbeRoCZVVMVg5z0FfIww");
-  //   expect(results.length).toBe(3);
-  // });
-
-  // test("Get User Playlists", async () => {
-  //   expect.assertions(1);
-  //   let results;
-  //   results = await ytm.getUser("UCPVhZsC2od1xjGhgEc2NEPQ");
-  //   results = await ytm.getUserPlaylists("UCPVhZsC2od1xjGhgEc2NEPQ", results["playlists"]["params"]);
-  //   expect(results.length).toBeGreaterThan(100);
-  // });
-
-  // test("Get Album BrowseId", async () => {
-  //   expect.assertions(1);
-  //   const browse_id = await ytm.getAlbumBrowseId("OLAK5uy_nMr9h2VlS-2PULNz3M3XVXQj_P3C2bqaY");
-  //   expect(browse_id).toBe(SAMPLE_ALBUM);
-  // });
-
-  // test("Get Album", async () => {
-  //   expect.assertions(5);
-  //   let results;
-  //   results = await ytm.getAlbum(SAMPLE_ALBUM);
-  //   expect(results.length).toBeGreaterThanOrEqual(9);
-  //   expect(results["tracks"][0]["isExplicit"]).toBeTruthy();
-  //   expect(results["tracks"][0]).toHaveProperty("feedbackTokens");
-  //   expect(results["other_versions"]).toHaveLength(2);
-  //   results = await ytm.getAlbum("MPREb_BQZvl3BFGay");
-  //   expect(results["tracks"]).toHaveLength(7);
-  // });
-
-  // test("Get Song", async () => {
-  //   expect.assertions(1);
-  //   // Private Song Check not implemented
-  //   const song = await ytm.getSong(SAMPLE_VIDEO);
-  //   expect(song["streamingData"]["adaptiveFormats"].length).toBeGreaterThanOrEqual(10);
-  // });
 
   test("Get Lyrics", async () => {
     expect.assertions(2);
