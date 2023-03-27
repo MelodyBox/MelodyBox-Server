@@ -14,8 +14,8 @@ const ytm = new YTMusicClient();
 
 async function main() {
   try {
-    const res = await ytm.getWatchPlaylist("HoBGWhapaho");
-    console.log("res", res.tracks.length);
+    const res = await ytm.getArtist("UCaPIRYCKs51kvD4jrbwMH1w");
+    console.log("res", res.name);
   } catch {
     console.log("err");
   }

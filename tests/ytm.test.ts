@@ -70,22 +70,22 @@ describe("Youtube Music Client Tests", () => {
     expect(results.length).toBeGreaterThan(5);
   });
 
-  // test("Get Artist", async () => {
-  //   expect.assertions(2);
-  //   let results;
-  //   results = await ytm.getArtist("MPLAUCmMUZbaYdNH0bEd1PAlAqsA");
-  //   expect(results.length).toBe(14);
+  test("Get Artist", async () => {
+    expect.assertions(3);
+    let results;
+    results = await ytm.getArtist("MPLAUCmMUZbaYdNH0bEd1PAlAqsA");
+    expect(Object.keys(results)).toHaveLength(14);
 
-  //   // test correctness of related artists
-  //   const arrayEq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-  //   const related = results["related"]["results"];
-  //   const t = related.filter((x) => arrayEq(Object.keys(x), ["browseId", "subscribers", "title", "thumbnails"]));
-  //   expect(t.length).toBe(related.length);
+    // test correctness of related artists
+    const arrayEq = (a: unknown[], b: unknown[]) => JSON.stringify(a) === JSON.stringify(b);
+    const related = results["related"]["results"];
+    const t = related.filter((x) => !arrayEq(Object.keys(x), ["browseId", "subscribers", "title", "thumbnails"]));
+    expect(t.length).toBe(related.length);
 
-  //   // no album year
-  //   results = await ytm.getArtist("UCLZ7tlKC06ResyDmEStSrOw");
-  //   expect(results.length).toBeGreaterThanOrEqual(11);
-  // });
+    // 2 albums
+    results = await ytm.getArtist("UCCNjeM2kdvErAtTQ-va5q4g");
+    expect(results["albums"]["results"].length).toBeGreaterThanOrEqual(2);
+  });
 
   // test("Get Artist Albums", async () => {
   //   expect.assertions(1);
