@@ -8,7 +8,7 @@ export class YTMusicClient {
   #pyYT: PyObject;
 
   constructor() {
-    this.#pyMod = py.importSync("src/utils/ytmusicconnect.py");
+    this.#pyMod = py.importSync("src/utils/YTMusicClient/ytmusicconnect.py");
     this.#pyYT = py.createSync(this.#pyMod, "YTMusic");
   }
 
