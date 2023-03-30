@@ -47,15 +47,18 @@ export async function searchSong(req: ApiRequest<SearchData>, res: Response) {
   return SuccessRes(res, { data: filteredResults });
 }
 
-export function getInfo(req: ApiRequest<InfoData>, res: Response) {
+export async function getInfo(req: ApiRequest<InfoData>, res: Response) {
   if (req["apiResult"] === undefined) {
     return ErrorRes(res, { message: "Request couldn't be verified" });
   }
   if (!req["apiResult"].success) {
     return ErrorRes(res, { message: req["apiResult"].error });
   }
-  const { data } = req["apiResult"];
-  return SuccessRes(res, { data });
+  const result = await fetchInfo(req["apiResult"].data.songID);
+  if (!result.success) {
+    return ErrorRes(res, { code: 500, message: "Failed to get info" });
+  }
+  return SuccessRes(res, { data: result.data });
 }
 
 export function getLyrics(req: ApiRequest<SongData>, res: Response) {
@@ -78,4 +81,25 @@ export function downloadSong(req: ApiRequest<SongData>, res: Response) {
   }
   const { data } = req["apiResult"];
   return SuccessRes(res, { data });
+}
+
+async function fetchInfo(songId: string) {
+  const results = await ytm.getSong(songId).catch((err) => {
+    console.log(err);
+    return { failed: true, msg: err.message };
+  });
+  if ("failed" in results) {
+    return { success: false, error: results.msg };
+  }
+  return {
+    success: true,
+    data: {
+      videoId: results.videoDetails.videoId,
+      title: results.videoDetails.title,
+      author: results.videoDetails.author,
+      durationInSeconds: results.videoDetails.lengthSeconds,
+      thumbnail: results.videoDetails.thumbnail.thumbnails.reduce((acc, val) => (val.width > acc.width ? val : acc))
+        .url,
+    },
+  };
 }
