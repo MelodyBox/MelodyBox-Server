@@ -103,3 +103,15 @@ async function fetchInfo(songId: string) {
     },
   };
 }
+
+type LyricsProvider = SongData["provider"];
+type LyricsResult = { [Provider in LyricsProvider]: Record<`${Provider}`, string> }[LyricsProvider];
+async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsResult> {
+  if (provider === "youtube") {
+    const playlist = await ytm.getWatchPlaylist(songId);
+    const lyrics = await ytm.getLyrics(playlist.lyrics);
+    return { youtube: lyrics.lyrics };
+  } else {
+    return { genius: "" };
+  }
+}
