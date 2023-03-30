@@ -86,6 +86,13 @@ describe("Youtube Music Client Tests", () => {
     expect(results["albums"]["results"].length).toBeGreaterThanOrEqual(2);
   });
 
+  test("Get Song", async () => {
+    expect.assertions(1);
+    // Private Song Check not implemented
+    const song = await ytm.getSong(SAMPLE_SONG);
+    expect(song["streamingData"]["adaptiveFormats"].length).toBeGreaterThanOrEqual(10);
+  });
+
   test("Get Lyrics", async () => {
     expect.assertions(2);
     const playlist = await ytm.getWatchPlaylist(SAMPLE_SONG);

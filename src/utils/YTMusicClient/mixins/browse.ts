@@ -87,6 +87,106 @@ const ArtistResult = z.object({
 });
 type ArtistResult = z.infer<typeof ArtistResult>;
 
+const SongFormat = z.object({
+  itag: z.number(),
+  mimeType: z.string(),
+  bitrate: z.number(),
+  width: z.number(),
+  height: z.number(),
+  lastModified: z.string(),
+  quality: z.string(),
+  fps: z.number(),
+  qualityLabel: z.string(),
+  projectionType: z.string(),
+  audioQuality: z.string(),
+  approxDurationMs: z.string(),
+  audioSampleRate: z.string(),
+  audioChannels: z.number(),
+  signatureCipher: z.string(),
+});
+
+const SongAdaptiveFormat = SongFormat.omit({
+  audioQuality: true,
+  audioSampleRate: true,
+  audioChannels: true,
+})
+  .partial()
+  .extend({
+    initRange: z.object({ start: z.string(), end: z.string() }),
+    indexRange: z.object({ start: z.string(), end: z.string() }),
+    contentLength: z.string(),
+    averageBitrate: z.number(),
+    colorInfo: z
+      .object({
+        primaries: z.string(),
+        transferCharacteristics: z.string(),
+        matrixCoefficients: z.string(),
+      })
+      .optional(),
+  });
+
+const VideoDetails = z.object({
+  videoId: z.string(),
+  title: z.string(),
+  lengthSeconds: z.string(),
+  channelId: z.string(),
+  isOwnerViewing: z.boolean(),
+  isCrawlable: z.boolean(),
+  thumbnail: z.object({
+    thumbnails: Thumbs,
+  }),
+  allowRatings: z.boolean(),
+  viewCount: z.string(),
+  author: z.string(),
+  isPrivate: z.boolean(),
+  isUnpluggedCorpus: z.boolean(),
+  musicVideoType: z.string(),
+  isLiveContent: z.boolean(),
+});
+
+const MicroFormat = z.object({
+  microformatDataRenderer: z.object({
+    urlCanonical: z.string().url(),
+    title: z.string(),
+    description: z.string().optional(),
+    thumbnail: z.object({
+      thumbnails: Thumbs,
+    }),
+    familySafe: z.boolean(),
+    // skipping bunch of keys
+    pageOwnerDetails: z.object({
+      name: z.string(),
+      externalChannelId: z.string(),
+      youtubeProfileUrl: z.string().url(),
+    }),
+    videoDetails: z.object({
+      externalVideoId: z.string(),
+      durationSeconds: z.string(),
+      // skip durationIso8601
+    }),
+    // skipping bunch of keys
+    category: z.string(),
+  }),
+});
+
+const SongInfo = z.object({
+  playabilityStatus: z.object({
+    status: z.string(),
+    playableInEmbed: z.boolean(),
+    // emmited not-needed objects
+  }),
+  streamingData: z.object({
+    expiresInSeconds: z.string(),
+    formats: z.array(SongFormat),
+    adaptiveFormats: z.array(SongAdaptiveFormat),
+  }),
+  // Don't care what is inside
+  playbackTracking: z.object({}),
+  videoDetails: VideoDetails,
+  microformat: MicroFormat,
+});
+type SongInfo = z.infer<typeof SongInfo>;
+
 import { _YTMusic } from "../YTMusic";
 import { GConstructor, Mixin } from "./mixin.helper";
 
@@ -118,6 +218,22 @@ export function BrowseMixin<TBase extends GConstructor<_YTMusic>>(Base: TBase) {
           return;
         }
         const safeResult = ArtistResult.safeParse(pythonResult.data);
+        if (!safeResult.success) {
+          reject(new Error("Response data couldn't be verified"));
+          return;
+        }
+        resolve(safeResult.data);
+      });
+    }
+
+    async getSong(videoId: string): Promise<SongInfo> {
+      return new Promise((resolve, reject) => {
+        const pythonResult = this.pythonCall("get_song", videoId);
+        if (!pythonResult.success) {
+          reject(new Error(pythonResult.error));
+          return;
+        }
+        const safeResult = SongInfo.safeParse(pythonResult.data);
         if (!safeResult.success) {
           reject(new Error("Response data couldn't be verified"));
           return;
