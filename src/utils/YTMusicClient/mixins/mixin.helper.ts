@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 //https://www.bryntum.com/blog/the-mixin-pattern-in-typescript-all-you-need-to-know/
 type AnyFunction<A = any> = (...input: any[]) => A;
 export type GConstructor<T> = new (...args: any[]) => T;
