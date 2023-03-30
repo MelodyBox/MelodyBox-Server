@@ -48,6 +48,17 @@ const songIDSchema = z.object({
     .refine((val) => ytdl.validateID(val), "songID is not a valid YouTube ID"),
 });
 
+export type InfoData = z.infer<typeof songIDSchema>;
+export function validInfoRequest(req: ApiRequest<InfoData>, _: Response, next: NextFunction) {
+  const paramResult = songIDSchema.safeParse(req.params);
+  if (!paramResult.success) {
+    req["apiResult"] = { success: false, error: ZodFirstError(paramResult) };
+    return next();
+  }
+  req["apiResult"] = { success: true, data: paramResult.data };
+  next();
+}
+
 const LyricsProvider = z.object({
   provider: z
     .enum(["youtube", "genius"], {
