@@ -19,7 +19,7 @@ export function SuccessRes<T>(res: Response, options: SuccessResOptions<T>) {
 
 export function ErrorRes(res: Response, options: ErrorResOptions) {
   return res.status(options.code ?? 400).json({
-    success: true,
+    success: false,
     error: options.message,
   });
 }
