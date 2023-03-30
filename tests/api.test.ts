@@ -57,3 +57,35 @@ describe("GET /info", () => {
     expect(res.body).toHaveProperty("success", true);
   });
 });
+
+describe("GET /lyrics", () => {
+  test("no songId provided", async () => {
+    expect.assertions(1);
+    const res = await request(BASE_URL).get("/lyrics");
+    expect(res.status).toBe(404);
+  });
+
+  test("bad songId", async () => {
+    expect.assertions(2);
+    const res = await request(BASE_URL).get("/lyrics/_");
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("error", "songID is not a valid YouTube ID");
+  });
+
+  test("bad lyrics provider", async () => {
+    expect.assertions(2);
+    const res = await request(BASE_URL).get("/lyrics/HoBGWhapaho?provider=twitch");
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty(
+      "error",
+      "The lyrics provider value should be one of these 'youtube', 'genius' but received 'twitch'"
+    );
+  });
+
+  test("proper request", async () => {
+    expect.assertions(2);
+    const res = await request(BASE_URL).get("/lyrics/HoBGWhapaho?provider=genius");
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("success", true);
+  });
+});
