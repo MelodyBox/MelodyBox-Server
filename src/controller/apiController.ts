@@ -33,7 +33,7 @@ export async function searchSong(req: ApiRequest<SearchData>, res: Response) {
         videoId: resultInfo.videoId,
         title: resultInfo.title,
         duration: resultInfo.duration,
-        artists: resultInfo.artists,
+        artists: resultInfo.artists.map((artist) => artist.name),
         thumbnail: resultInfo.thumbnails.reduce((acc, val) => (val.width > acc.width ? val : acc)).url,
       };
     } else {
