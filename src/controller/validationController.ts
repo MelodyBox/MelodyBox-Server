@@ -1,6 +1,6 @@
 import { ApiRequest } from "../routers/api";
 import { Response, NextFunction } from "express";
-import { z } from "zod";
+import { z, ZodIssueOptionalMessage } from "zod";
 import ytdl from "ytdl-core";
 
 // Helper Type
@@ -59,17 +59,23 @@ export function validInfoRequest(req: ApiRequest<InfoData>, _: Response, next: N
   next();
 }
 
+type InvalidEnumError = {
+  received: string;
+  code: "invalid_enum_value";
+  options: string[];
+  path: string[];
+};
+
+const enumError = (val: ZodIssueOptionalMessage) => {
+  const rec = (val as InvalidEnumError).received;
+  const options = (val as InvalidEnumError).options.map((s) => `'${s}'`).join(", ");
+  return {
+    message: `The lyrics provider value should be one of these ${options} but received '${rec}'`,
+  };
+};
+
 const LyricsProvider = z.object({
-  provider: z
-    .enum(["youtube", "genius"], {
-      errorMap: (val) => {
-        const rec = (val as { received: string }).received;
-        return {
-          message: `The lyrics provider value should be one of these 'youtube', 'genius' but received '${rec}'`,
-        };
-      },
-    })
-    .default("youtube"),
+  provider: z.enum(["youtube", "genius"], { errorMap: enumError }).default("youtube"),
 });
 
 export type SongData = Expand<z.infer<typeof songIDSchema> & z.infer<typeof LyricsProvider>>;
