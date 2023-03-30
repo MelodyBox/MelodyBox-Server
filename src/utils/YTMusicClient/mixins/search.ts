@@ -41,7 +41,7 @@ const SongResult = z.object({
   isExplicit: z.boolean(),
   thumbnails: Thumbs,
 });
-type SongResult = z.infer<typeof SongResult>;
+export type SongResult = z.infer<typeof SongResult>;
 
 const VideoResult = z.object({
   category: z.literal("Videos"),
@@ -54,7 +54,7 @@ const VideoResult = z.object({
   duration_seconds: z.number().default(-1),
   thumbnails: Thumbs,
 });
-type VideoResult = z.infer<typeof VideoResult>;
+export type VideoResult = z.infer<typeof VideoResult>;
 
 const AlbumResult = z.object({
   category: z.literal("Albums"),
@@ -78,7 +78,7 @@ const ArtistResult = z.object({
   browseId: z.string(),
   thumbnails: Thumbs,
 });
-type ArtistResult = z.infer<typeof ArtistResult>;
+export type ArtistResult = z.infer<typeof ArtistResult>;
 
 const PlaylistResult = z.object({
   resultType: z.literal("playlist"),
