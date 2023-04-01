@@ -10,6 +10,10 @@ import { env } from "../env";
 import * as Genius from "genius-lyrics";
 const GeniusClient = new Genius.Client(env.GENIUS_SECRET);
 
+import fs from "fs";
+import path from "path";
+import ytdl from "ytdl-core";
+
 import type { SongResult, VideoResult, ArtistResult } from "../utils/YTMusicClient/mixins/search";
 type SearchResult = SongResult | VideoResult | ArtistResult;
 
@@ -93,9 +97,9 @@ export async function downloadSong(req: ApiRequest<SongData>, res: Response) {
       throw new Error(info.error);
     }
     const meta = info.data;
-    const text = lyrics.success && lyrics.data.lyrics !== "This song is an instrumental" ? lyrics.data : "";
-    console.log({ meta, text });
-    return SuccessRes(res, { data: "hi" });
+    const text = lyrics.success && lyrics.data.lyrics !== "This song is an instrumental" ? lyrics.data.lyrics : "";
+    const filePath = await fetchSong(meta, text);
+    return SuccessRes(res, { data: filePath });
   } catch (err) {
     return ErrorRes(res, { message: (err as Error).message });
   }
@@ -160,4 +164,20 @@ async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<Ly
     console.error(err);
     return { success: false, error: `Failed to fetch lyrics from '${provider}'` };
   }
+}
+
+async function asyncYTDL(filePath: string, link: string, options?: ytdl.downloadOptions) {
+  return new Promise((resolve, reject) => {
+    const stream = ytdl(link, options);
+    stream.pipe(fs.createWriteStream(filePath));
+    stream.on("error", (err) => reject(err));
+    stream.on("end", () => resolve(filePath));
+  });
+}
+
+async function fetchSong(meta: InfoResult, lyrics: string) {
+  const filePath = path.resolve(__dirname, "..", "..", "downloads", `${meta.title}.mp3`);
+  const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
+  await asyncYTDL(filePath, url, { filter: "audioonly" });
+  return filePath;
 }
