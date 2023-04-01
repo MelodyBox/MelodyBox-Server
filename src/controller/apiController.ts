@@ -7,7 +7,7 @@ import YTMusicClient from "../utils/YTMusicClient";
 const ytm = new YTMusicClient();
 
 import { env } from "../env";
-import Genius from "genius-lyrics";
+import * as Genius from "genius-lyrics";
 const GeniusClient = new Genius.Client(env.GENIUS_SECRET);
 
 import type { SongResult, VideoResult, ArtistResult } from "../utils/YTMusicClient/mixins/search";
@@ -65,15 +65,19 @@ export async function getInfo(req: ApiRequest<InfoData>, res: Response) {
   return SuccessRes(res, { data: result.data });
 }
 
-export function getLyrics(req: ApiRequest<SongData>, res: Response) {
+export async function getLyrics(req: ApiRequest<SongData>, res: Response) {
   if (req["apiResult"] === undefined) {
     return ErrorRes(res, { message: "Request couldn't be verified" });
   }
   if (!req["apiResult"].success) {
     return ErrorRes(res, { message: req["apiResult"].error });
   }
-  const { data } = req["apiResult"];
-  return SuccessRes(res, { data });
+  try {
+    const lyrics = await fetchLyrics(req["apiResult"].data.songID, req["apiResult"].data.provider);
+    return SuccessRes(res, { data: lyrics });
+  } catch (err) {
+    return ErrorRes(res, { message: (err as Error).message });
+  }
 }
 
 export function downloadSong(req: ApiRequest<SongData>, res: Response) {
@@ -118,15 +122,14 @@ type LyricsResult = {
 
 async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsResult> {
   try {
+    const playlist = await ytm.getWatchPlaylist(songId);
     if (provider === "youtube") {
-      const playlist = await ytm.getWatchPlaylist(songId);
       const lyrics = await ytm.getLyrics(playlist.lyrics);
       return { lyrics: lyrics.lyrics, source: provider };
     } else {
-      const { title } = (await ytm.getSong(songId)).videoDetails;
-      const [song] = await GeniusClient.songs.search(title);
+      const [song] = await GeniusClient.songs.search(playlist.tracks[0].title);
       const lyrics = await song.lyrics();
-      const text = lyrics.replaceAll(/\[.+\]\n/g, "");
+      const text = lyrics.replaceAll(/\[.+\]\n/g, ""); // removes stuff like [Chorus]
       return { lyrics: text, source: provider };
     }
   } catch (err) {
