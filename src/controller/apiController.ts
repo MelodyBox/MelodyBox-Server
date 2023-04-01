@@ -6,6 +6,10 @@ import { ErrorRes, SuccessRes } from "../utils/responseTypes";
 import YTMusicClient from "../utils/YTMusicClient";
 const ytm = new YTMusicClient();
 
+import { env } from "../env";
+import Genius from "genius-lyrics";
+const GeniusClient = new Genius.Client(env.GENIUS_SECRET);
+
 import type { SongResult, VideoResult, ArtistResult } from "../utils/YTMusicClient/mixins/search";
 type SearchResult = SongResult | VideoResult | ArtistResult;
 
@@ -113,11 +117,20 @@ type LyricsResult = {
 }[LyricsProvider];
 
 async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsResult> {
-  if (provider === "youtube") {
-    const playlist = await ytm.getWatchPlaylist(songId);
-    const lyrics = await ytm.getLyrics(playlist.lyrics);
-    return { lyrics: lyrics.lyrics, source: "youtube" };
-  } else {
-    return { lyrics: "", source: "genius" };
+  try {
+    if (provider === "youtube") {
+      const playlist = await ytm.getWatchPlaylist(songId);
+      const lyrics = await ytm.getLyrics(playlist.lyrics);
+      return { lyrics: lyrics.lyrics, source: provider };
+    } else {
+      const { title } = (await ytm.getSong(songId)).videoDetails;
+      const [song] = await GeniusClient.songs.search(title);
+      const lyrics = await song.lyrics();
+      const text = lyrics.replaceAll(/\[.+\]\n/g, "");
+      return { lyrics: text, source: provider };
+    }
+  } catch (err) {
+    console.error(err);
+    throw new Error(`Failed to fetch lyrics from '${provider}'`);
   }
 }
