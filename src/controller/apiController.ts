@@ -105,32 +105,34 @@ export async function downloadSong(req: ApiRequest<SongData>, res: Response) {
   }
 }
 
-type InfoResult = {
+export type InfoResult = {
   videoId: string;
   title: string;
-  author: string;
-  durationInSeconds: string;
+  artist: string;
+  album: string;
+  duration: string;
   thumbnail: string;
 };
 type InfoSafeResult = { success: true; data: InfoResult } | { success: false; error: string };
 
 async function fetchInfo(songId: string): Promise<InfoSafeResult> {
-  const results = await ytm.getSong(songId).catch((err) => {
+  const results = await ytm.getWatchPlaylist(songId).catch((err) => {
     console.log(err);
     return { failed: true, msg: err.message };
   });
   if ("failed" in results) {
     return { success: false, error: results.msg };
   }
+  const song = results.tracks[0];
   return {
     success: true,
     data: {
-      videoId: results.videoDetails.videoId,
-      title: results.videoDetails.title,
-      author: results.videoDetails.author,
-      durationInSeconds: results.videoDetails.lengthSeconds,
-      thumbnail: results.videoDetails.thumbnail.thumbnails.reduce((acc, val) => (val.width > acc.width ? val : acc))
-        .url,
+      videoId: song.videoId,
+      title: song.title,
+      artist: song.artists.map((artist) => artist.name).join(", "),
+      album: song.album.name || "",
+      duration: song.length,
+      thumbnail: song.thumbnail.reduce((acc, val) => (val.width > acc.width ? val : acc)).url,
     },
   };
 }
