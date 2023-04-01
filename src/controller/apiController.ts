@@ -72,14 +72,14 @@ export async function getLyrics(req: ApiRequest<SongData>, res: Response) {
   if (!req["apiResult"].success) {
     return ErrorRes(res, { message: req["apiResult"].error });
   }
-    const lyrics = await fetchLyrics(req["apiResult"].data.songID, req["apiResult"].data.provider);
+  const lyrics = await fetchLyrics(req["apiResult"].data.songID, req["apiResult"].data.provider);
   if (!lyrics.success) {
     return ErrorRes(res, { message: lyrics.error });
   }
   return SuccessRes(res, { data: lyrics.data });
 }
 
-export function downloadSong(req: ApiRequest<SongData>, res: Response) {
+export async function downloadSong(req: ApiRequest<SongData>, res: Response) {
   if (req["apiResult"] === undefined) {
     return ErrorRes(res, { message: "Request couldn't be verified" });
   }
@@ -87,7 +87,18 @@ export function downloadSong(req: ApiRequest<SongData>, res: Response) {
     return ErrorRes(res, { message: req["apiResult"].error });
   }
   const { data } = req["apiResult"];
-  return SuccessRes(res, { data });
+  try {
+    const [info, lyrics] = await Promise.all([fetchInfo(data.songID), fetchLyrics(data.songID, data.provider)]);
+    if (!info.success) {
+      throw new Error(info.error);
+    }
+    const meta = info.data;
+    const text = lyrics.success ? lyrics.data : "";
+    console.log({ meta, text });
+    return SuccessRes(res, { data: "hi" });
+  } catch (err) {
+    return ErrorRes(res, { message: (err as Error).message });
+  }
 }
 
 type InfoResult = {
