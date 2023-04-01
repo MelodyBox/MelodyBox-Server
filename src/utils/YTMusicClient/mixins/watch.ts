@@ -15,7 +15,7 @@ const WatchResult = z.object({
     })
   ),
   playlistId: z.string(),
-  lyrics: z.string(),
+  lyrics: z.string().default(""),
   related: z.string(),
 });
 type WatchResult = z.infer<typeof WatchResult>;

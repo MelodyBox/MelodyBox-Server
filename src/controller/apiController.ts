@@ -93,7 +93,7 @@ export async function downloadSong(req: ApiRequest<SongData>, res: Response) {
       throw new Error(info.error);
     }
     const meta = info.data;
-    const text = lyrics.success ? lyrics.data : "";
+    const text = lyrics.success && lyrics.data.lyrics !== "This song is an instrumental" ? lyrics.data : "";
     console.log({ meta, text });
     return SuccessRes(res, { data: "hi" });
   } catch (err) {
@@ -143,6 +143,10 @@ type LyricsSafeResult = { success: true; data: LyricsResult } | { success: false
 async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsSafeResult> {
   try {
     const playlist = await ytm.getWatchPlaylist(songId);
+    // bad decision?
+    if (playlist.lyrics === "") {
+      return { success: true, data: { source: provider, lyrics: "This song is an instrumental" } };
+    }
     if (provider === "youtube") {
       const lyrics = await ytm.getLyrics(playlist.lyrics);
       return { success: true, data: { lyrics: lyrics.lyrics, source: provider } };
