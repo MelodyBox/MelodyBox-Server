@@ -24,6 +24,7 @@ async function asyncYTDL(filePath: string, link: string, options?: ytdl.download
       reject(`Error while downloading song: ${err.message}`);
     });
     stream.on("end", async () => {
+      // original: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
       cp.execSync(`${ffmpeg} -y -loglevel 24 -i ${webmPath} -vn -sn -c:a mp3 -ab 192k ${filePath}`);
       await fsp.rm(webmPath);
       resolve(filePath);
