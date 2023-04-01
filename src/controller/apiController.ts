@@ -90,7 +90,16 @@ export function downloadSong(req: ApiRequest<SongData>, res: Response) {
   return SuccessRes(res, { data });
 }
 
-async function fetchInfo(songId: string) {
+type InfoResult = {
+  videoId: string;
+  title: string;
+  author: string;
+  durationInSeconds: string;
+  thumbnail: string;
+};
+type InfoSafeResult = { success: true; data: InfoResult } | { success: false; error: string };
+
+async function fetchInfo(songId: string): Promise<InfoSafeResult> {
   const results = await ytm.getSong(songId).catch((err) => {
     console.log(err);
     return { failed: true, msg: err.message };
