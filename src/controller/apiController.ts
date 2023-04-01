@@ -72,12 +72,11 @@ export async function getLyrics(req: ApiRequest<SongData>, res: Response) {
   if (!req["apiResult"].success) {
     return ErrorRes(res, { message: req["apiResult"].error });
   }
-  try {
     const lyrics = await fetchLyrics(req["apiResult"].data.songID, req["apiResult"].data.provider);
-    return SuccessRes(res, { data: lyrics });
-  } catch (err) {
-    return ErrorRes(res, { message: (err as Error).message });
+  if (!lyrics.success) {
+    return ErrorRes(res, { message: lyrics.error });
   }
+  return SuccessRes(res, { data: lyrics.data });
 }
 
 export function downloadSong(req: ApiRequest<SongData>, res: Response) {
@@ -119,21 +118,22 @@ type LyricsResult = {
     source: Provider;
   };
 }[LyricsProvider];
+type LyricsSafeResult = { success: true; data: LyricsResult } | { success: false; error: string };
 
-async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsResult> {
+async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<LyricsSafeResult> {
   try {
     const playlist = await ytm.getWatchPlaylist(songId);
     if (provider === "youtube") {
       const lyrics = await ytm.getLyrics(playlist.lyrics);
-      return { lyrics: lyrics.lyrics, source: provider };
+      return { success: true, data: { lyrics: lyrics.lyrics, source: provider } };
     } else {
       const [song] = await GeniusClient.songs.search(playlist.tracks[0].title);
       const lyrics = await song.lyrics();
       const text = lyrics.replaceAll(/\[.+\]\n/g, ""); // removes stuff like [Chorus]
-      return { lyrics: text, source: provider };
+      return { success: true, data: { lyrics: text, source: provider } };
     }
   } catch (err) {
     console.error(err);
-    throw new Error(`Failed to fetch lyrics from '${provider}'`);
+    return { success: false, error: `Failed to fetch lyrics from '${provider}'` };
   }
 }
