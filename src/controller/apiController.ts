@@ -10,9 +10,7 @@ import { env } from "../env";
 import * as Genius from "genius-lyrics";
 const GeniusClient = new Genius.Client(env.GENIUS_SECRET);
 
-import fs from "fs";
-import path from "path";
-import ytdl from "ytdl-core";
+import { fetchSong } from "../utils/fetchSong";
 
 import type { SongResult, VideoResult, ArtistResult } from "../utils/YTMusicClient/mixins/search";
 type SearchResult = SongResult | VideoResult | ArtistResult;
@@ -166,20 +164,4 @@ async function fetchLyrics(songId: string, provider: LyricsProvider): Promise<Ly
     console.error(err);
     return { success: false, error: `Failed to fetch lyrics from '${provider}'` };
   }
-}
-
-async function asyncYTDL(filePath: string, link: string, options?: ytdl.downloadOptions) {
-  return new Promise((resolve, reject) => {
-    const stream = ytdl(link, options);
-    stream.pipe(fs.createWriteStream(filePath));
-    stream.on("error", (err) => reject(err));
-    stream.on("end", () => resolve(filePath));
-  });
-}
-
-async function fetchSong(meta: InfoResult, lyrics: string) {
-  const filePath = path.resolve(__dirname, "..", "..", "downloads", `${meta.title}.mp3`);
-  const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
-  await asyncYTDL(filePath, url, { filter: "audioonly" });
-  return filePath;
 }
