@@ -27,8 +27,10 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "ffmpeg-static": "^5.1.0",
     "genius-lyrics": "^4.4.3",
     "node-calls-python": "^1.7.6",
+    "node-id3tag": "^0.9.8",
     "ytdl-core": "^4.11.3",
     "zod": "^3.21.4"
   },
