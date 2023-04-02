@@ -67,7 +67,6 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
       title: meta.title,
       artist: meta.artist,
       album: meta.album,
-      USLT: lyrics,
       APIC: thumbPath,
       comment: {
         language: "eng",
