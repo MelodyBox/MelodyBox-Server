@@ -5,8 +5,8 @@ import cp from "child_process";
 
 import ytdl from "ytdl-core";
 import ffmpeg from "ffmpeg-static";
-// @ts-expect-error The author used module.exports with typescript
-import NodeID3Tag from "node-id3tag";
+/* eslint @typescript-eslint/no-var-requires: 0 */
+const NodeID3Tag = require("node-id3tag");
 import https from "https";
 
 import { InfoResult } from "../controller/apiController";
