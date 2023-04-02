@@ -52,7 +52,8 @@ async function fetchThumbnail(thumbPath: string, url: string) {
 }
 
 export async function fetchSong(meta: InfoResult, lyrics: string) {
-  const safeTitle = meta.title.replaceAll(/[^a-z0-9]/gi, "_");
+  // regex changed to make Windows Safe Filename.
+  const safeTitle = meta.title.replaceAll(/[/<>:"\\|?*\s]/gi, "_");
   const filePath = path.resolve(__dirname, "..", "..", "downloads", `${safeTitle}.mp3`);
   const thumbPath = filePath.replace(".mp3", "_thumb.jpg");
   const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
