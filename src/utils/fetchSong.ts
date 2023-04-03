@@ -45,7 +45,7 @@ async function fetchThumbnail(thumbPath: string, url: string) {
   });
 }
 
-async function convertToMp3(filePath: string, cover: string) {
+async function convertToMp3(filePath: string, cover: string, meta: InfoResult) {
   const inputFile = filePath.replace(".mp3", ".webm");
   const outputFile = filePath;
   return new Promise((resolve) => {
@@ -63,6 +63,10 @@ async function convertToMp3(filePath: string, cover: string) {
       -ab 192k      : sets audio bitrate to 192K.
 
       ID3v2 Tag arguments:
+      -metadata title   : sets the title.
+      -metadata artist  : sets the artist.
+      -metadata album   : sets the album.
+      -metadata comment : sets the comment.
       -map 0            : map streams of the 0th (first) input to the output.
       -map 1:0          : map 0th stream (image data) of the 1th (second) input (cover) to the output.
       -write_id3v2 1    : write the tags as ID3v2.
@@ -89,6 +93,14 @@ async function convertToMp3(filePath: string, cover: string) {
         "0",
         "-map",
         "1:0",
+        "-metadata",
+        `title=${meta.title}`,
+        "-metadata",
+        `artist=${meta.artist}`,
+        "-metadata",
+        `album=${meta.album}`,
+        "-metadata",
+        `comment=Downloaded from: https://music.youtube.com/watch?v=${meta.videoId}`,
         "-write_id3v2",
         "1",
         outputFile,
@@ -108,7 +120,7 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
   await fetchThumbnail(thumbPath, meta.thumbnail);
   await asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" });
-  await convertToMp3(filePath, thumbPath);
+  await convertToMp3(filePath, thumbPath, meta);
   // await Promise.all([
   //   asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
   //   fetchThumbnail(thumbPath, meta.thumbnail),
