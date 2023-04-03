@@ -50,8 +50,23 @@ async function convertToMp3(options: MP3Options) {
   const inputFile = options.filePath.replace(".mp3", ".webm");
   const outputFile = options.filePath;
   return new Promise((resolve) => {
-    // original: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
-    cp.execSync(`${ffmpeg} -y -loglevel 24 -i ${inputFile} -vn -sn -c:a mp3 -ab 192k ${outputFile}`);
+    // Reference: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
+    /*
+      Input:
+      -i inputFile  : set input file to inputFile.
+
+      Convert arguments:
+      -y            : set overwrite output file.
+      -loglevel 24  : set logging level.
+      -vn           : disable video recording.
+      -sn           : disable subtitle recording.
+      -c:a mp3      : sets audio codec to mp3.
+      -ab 192k      : sets audio bitrate to 192K.
+
+      Output:
+      outputFile    : sets output file to outputFile.
+    */
+    cp.execSync(`${ffmpeg} -i ${inputFile} -y -loglevel 24 -vn -sn -c:a mp3 -ab 192k ${outputFile}`);
     resolve(outputFile);
   });
 }
