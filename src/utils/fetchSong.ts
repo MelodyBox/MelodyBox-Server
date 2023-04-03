@@ -45,7 +45,7 @@ async function fetchThumbnail(thumbPath: string, url: string) {
   });
 }
 
-async function convertToMp3(filePath: string) {
+async function convertToMp3(filePath: string, cover: string) {
   const inputFile = filePath.replace(".mp3", ".webm");
   const outputFile = filePath;
   return new Promise((resolve) => {
@@ -53,34 +53,47 @@ async function convertToMp3(filePath: string) {
     /*
       Input:
       -i inputFile  : set input file to inputFile.
+      -i cover      : set conver art as stream 1.
 
       Convert arguments:
       -y            : set overwrite output file.
       -loglevel 24  : set logging level.
-      -vn           : disable video recording.
       -sn           : disable subtitle recording.
       -c:a mp3      : sets audio codec to mp3.
       -ab 192k      : sets audio bitrate to 192K.
 
+      ID3v2 Tag arguments:
+      -map 0            : map streams of the 0th (first) input to the output.
+      -map 1:0          : map 0th stream (image data) of the 1th (second) input (cover) to the output.
+      -write_id3v2 1    : write the tags as ID3v2.
+
       Output:
       outputFile    : sets output file to outputFile.
     */
-    const cmd = shell([
-      ffmpeg,
-      "-y",
-      "-i",
-      inputFile,
-      "-loglevel",
-      "24",
-      "-vn",
-      "-sn",
-      "-c:a",
-      "mp3",
-      "-ab",
-      "192k",
-      outputFile,
-    ]);
-    cp.execSync(cmd);
+    cp.execSync(
+      shell([
+        ffmpeg,
+        "-y",
+        "-i",
+        inputFile,
+        "-i",
+        cover,
+        "-loglevel",
+        "24",
+        "-sn",
+        "-c:a",
+        "mp3",
+        "-ab",
+        "192k",
+        "-map",
+        "0",
+        "-map",
+        "1:0",
+        "-write_id3v2",
+        "1",
+        outputFile,
+      ])
+    );
     resolve(outputFile);
   });
 }
@@ -95,7 +108,7 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
   await fetchThumbnail(thumbPath, meta.thumbnail);
   await asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" });
-  await convertToMp3(filePath);
+  await convertToMp3(filePath, thumbPath);
   // await Promise.all([
   //   asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
   //   fetchThumbnail(thumbPath, meta.thumbnail),
