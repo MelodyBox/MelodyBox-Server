@@ -122,30 +122,12 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
   await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
   await fetchThumbnail(thumbPath, meta.thumbnail);
-  await asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" });
+  await Promise.allSettled([
+    asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
+    fetchThumbnail(thumbPath, meta.thumbnail),
+  ]);
   await convertToMp3(filePath, thumbPath, meta, lyrics);
-  // await Promise.all([
-  //   asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
-  //   fetchThumbnail(thumbPath, meta.thumbnail),
-  // ]);
-  // const success = NodeID3Tag.write(
-  //   {
-  //     title: meta.title,
-  //     artist: meta.artist,
-  //     album: meta.album,
-  //     APIC: thumbPath,
-  //     comment: {
-  //       language: "eng",
-  //       text: `Downloaded from: https://music.youtube.com/watch?v=${meta.videoId}`,
-  //     },
-  //   },
-  //   filePath
-  // );
-  // if (!success) {
-  //   await fsp.unlink(filePath);
-  //   await fsp.unlink(thumbPath);
-  //   throw new Error("Couldn't write tags to song");
-  // }
-  // await fsp.unlink(thumbPath);
+  await fsp.rm(filePath.replace(".mp3", ".webm"));
+  await fsp.rm(thumbPath);
   return filePath;
 }
