@@ -5,8 +5,6 @@ import cp from "child_process";
 
 import ytdl from "ytdl-core";
 import ffmpeg from "ffmpeg-static";
-/* eslint @typescript-eslint/no-var-requires: 0 */
-const NodeID3Tag = require("node-id3tag");
 import https from "https";
 
 import { InfoResult } from "../controller/apiController";
@@ -53,6 +51,7 @@ async function fetchThumbnail(thumbPath: string, url: string) {
 
 export async function fetchSong(meta: InfoResult, lyrics: string) {
   // regex changed to make Windows Safe Filename.
+  console.log({ meta, lyrics });
   const safeTitle = meta.title.replaceAll(/[/<>:"\\|?*\s]/gi, "_");
   const filePath = path.resolve(__dirname, "..", "..", "downloads", `${safeTitle}.mp3`);
   const thumbPath = filePath.replace(".mp3", "_thumb.jpg");
@@ -62,24 +61,24 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
     asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
     fetchThumbnail(thumbPath, meta.thumbnail),
   ]);
-  const success = NodeID3Tag.write(
-    {
-      title: meta.title,
-      artist: meta.artist,
-      album: meta.album,
-      APIC: thumbPath,
-      comment: {
-        language: "eng",
-        text: `Downloaded from: https://music.youtube.com/watch?v=${meta.videoId}`,
-      },
-    },
-    filePath
-  );
-  if (!success) {
-    await fsp.unlink(filePath);
-    await fsp.unlink(thumbPath);
-    throw new Error("Couldn't write tags to song");
-  }
+  // const success = NodeID3Tag.write(
+  //   {
+  //     title: meta.title,
+  //     artist: meta.artist,
+  //     album: meta.album,
+  //     APIC: thumbPath,
+  //     comment: {
+  //       language: "eng",
+  //       text: `Downloaded from: https://music.youtube.com/watch?v=${meta.videoId}`,
+  //     },
+  //   },
+  //   filePath
+  // );
+  // if (!success) {
+  //   await fsp.unlink(filePath);
+  //   await fsp.unlink(thumbPath);
+  //   throw new Error("Couldn't write tags to song");
+  // }
   await fsp.unlink(thumbPath);
   return filePath;
 }
