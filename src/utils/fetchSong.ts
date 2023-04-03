@@ -5,6 +5,8 @@ import cp from "child_process";
 
 import ytdl from "ytdl-core";
 import ffmpeg from "ffmpeg-static";
+// @ts-expect-error no type declaration
+import shell from "any-shell-escape";
 import https from "https";
 
 import { InfoResult } from "../controller/apiController";
@@ -43,12 +45,9 @@ async function fetchThumbnail(thumbPath: string, url: string) {
   });
 }
 
-type MP3Options = {
-  filePath: string;
-};
-async function convertToMp3(options: MP3Options) {
-  const inputFile = options.filePath.replace(".mp3", ".webm");
-  const outputFile = options.filePath;
+async function convertToMp3(filePath: string) {
+  const inputFile = filePath.replace(".mp3", ".webm");
+  const outputFile = filePath;
   return new Promise((resolve) => {
     // Reference: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
     /*
@@ -66,7 +65,22 @@ async function convertToMp3(options: MP3Options) {
       Output:
       outputFile    : sets output file to outputFile.
     */
-    cp.execSync(`${ffmpeg} -i ${inputFile} -y -loglevel 24 -vn -sn -c:a mp3 -ab 192k ${outputFile}`);
+    const cmd = shell([
+      ffmpeg,
+      "-y",
+      "-i",
+      inputFile,
+      "-loglevel",
+      "24",
+      "-vn",
+      "-sn",
+      "-c:a",
+      "mp3",
+      "-ab",
+      "192k",
+      outputFile,
+    ]);
+    cp.execSync(cmd);
     resolve(outputFile);
   });
 }
@@ -81,7 +95,7 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
   await fetchThumbnail(thumbPath, meta.thumbnail);
   await asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" });
-  await convertToMp3({ filePath });
+  await convertToMp3(filePath);
   // await Promise.all([
   //   asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
   //   fetchThumbnail(thumbPath, meta.thumbnail),
