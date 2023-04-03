@@ -19,14 +19,9 @@ async function asyncYTDL(filePath: string, link: string, options?: ytdl.download
     stream.pipe(fs.createWriteStream(webmPath));
     stream.on("error", async (err) => {
       await fsp.unlink(webmPath);
-      reject(`Error while downloading song: ${err.message}`);
+      reject(`Error while downloading song:\n${err.message}`);
     });
-    stream.on("end", async () => {
-      // original: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
-      cp.execSync(`${ffmpeg} -y -loglevel 24 -i ${webmPath} -vn -sn -c:a mp3 -ab 192k ${filePath}`);
-      await fsp.rm(webmPath);
-      resolve(filePath);
-    });
+    stream.on("end", () => resolve(filePath));
   });
 }
 
@@ -41,11 +36,23 @@ async function fetchThumbnail(thumbPath: string, url: string) {
           resolve(thumbPath);
         });
       })
-      .on("error", (err) => {
-        fs.unlink(thumbPath, () => {
-          reject(`Error while downloading song: ${err.message}`);
-        });
+      .on("error", async (err) => {
+        await fsp.unlink(thumbPath);
+        reject(`Error while downloading song:\n${err.message}`);
       });
+  });
+}
+
+type MP3Options = {
+  filePath: string;
+};
+async function convertToMp3(options: MP3Options) {
+  const inputFile = options.filePath.replace(".mp3", ".webm");
+  const outputFile = options.filePath;
+  return new Promise((resolve) => {
+    // original: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
+    cp.execSync(`${ffmpeg} -y -loglevel 24 -i ${inputFile} -vn -sn -c:a mp3 -ab 192k ${outputFile}`);
+    resolve(outputFile);
   });
 }
 
@@ -57,10 +64,13 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   const thumbPath = filePath.replace(".mp3", "_thumb.jpg");
   const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
   await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
-  await Promise.all([
-    asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
-    fetchThumbnail(thumbPath, meta.thumbnail),
-  ]);
+  await fetchThumbnail(thumbPath, meta.thumbnail);
+  await asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" });
+  await convertToMp3({ filePath });
+  // await Promise.all([
+  //   asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
+  //   fetchThumbnail(thumbPath, meta.thumbnail),
+  // ]);
   // const success = NodeID3Tag.write(
   //   {
   //     title: meta.title,
@@ -79,6 +89,6 @@ export async function fetchSong(meta: InfoResult, lyrics: string) {
   //   await fsp.unlink(thumbPath);
   //   throw new Error("Couldn't write tags to song");
   // }
-  await fsp.unlink(thumbPath);
+  // await fsp.unlink(thumbPath);
   return filePath;
 }

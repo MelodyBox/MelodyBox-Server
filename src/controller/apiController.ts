@@ -11,7 +11,7 @@ import * as Genius from "genius-lyrics";
 const GeniusClient = new Genius.Client(env.GENIUS_SECRET);
 
 import { fetchSong } from "../utils/fetchSong";
-import fs from "fs/promises";
+// import fs from "fs/promises";
 
 import type { SongResult, VideoResult, ArtistResult } from "../utils/YTMusicClient/mixins/search";
 type SearchResult = SongResult | VideoResult | ArtistResult;
@@ -98,9 +98,10 @@ export async function downloadSong(req: ApiRequest<SongData>, res: Response) {
     const meta = info.data;
     const text = lyrics.success && lyrics.data.lyrics !== "This song is an instrumental" ? lyrics.data.lyrics : "";
     const filePath = await fetchSong(meta, text);
-    res.download(filePath);
-    await fs.rm(filePath);
-    return;
+    return SuccessRes(res, { data: filePath });
+    // res.download(filePath);
+    // await fs.rm(filePath);
+    // return;
   } catch (err) {
     return ErrorRes(res, { message: (err as Error).message });
   }
