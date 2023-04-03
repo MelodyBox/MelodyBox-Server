@@ -11,19 +11,18 @@ import https from "https";
 
 import { InfoResult } from "../controller/apiController";
 
-async function asyncYTDL(filePath: string, link: string, options?: ytdl.downloadOptions) {
+async function asyncYTDL(webmPath: string, link: string, options?: ytdl.downloadOptions) {
   if (!ffmpeg) {
     throw new Error("Failed to resolve ffmpeg binary");
   }
-  const webmPath = filePath.replace(".mp3", ".webm");
   return new Promise((resolve, reject) => {
     const stream = ytdl(link, options);
     stream.pipe(fs.createWriteStream(webmPath));
     stream.on("error", async (err) => {
-      await fsp.unlink(webmPath);
+      await fsp.rm(webmPath);
       reject(`Error while downloading song:\n${err.message}`);
     });
-    stream.on("end", () => resolve(filePath));
+    stream.on("end", () => resolve(true));
   });
 }
 
@@ -45,9 +44,9 @@ async function fetchThumbnail(thumbPath: string, url: string) {
   });
 }
 
-async function convertToMp3(filePath: string, cover: string, meta: InfoResult, lyrics: string) {
-  const inputFile = filePath.replace(".mp3", ".webm");
-  const outputFile = filePath;
+async function convertToMp3(baseName: string, cover: string, meta: InfoResult, lyrics: string) {
+  const inputFile = baseName + ".webm";
+  const outputFile = baseName + ".mp3";
   return new Promise((resolve) => {
     // Reference: https://github.com/joshunrau/ytdl-mp3/blob/4970d70b9b030df73bd796765c180b99ca7b032d/src/convertVideoToAudio.ts#L15
     /*
@@ -103,19 +102,19 @@ async function convertToMp3(filePath: string, cover: string, meta: InfoResult, l
 
 export async function fetchSong(meta: InfoResult, lyrics: string) {
   // regex changed to make Windows Safe Filename.
-  console.log({ meta, lyrics });
   const safeTitle = meta.title.replaceAll(/[/<>:"\\|?*\s]/gi, "_");
-  const filePath = path.resolve(__dirname, "..", "..", "downloads", `${safeTitle}.mp3`);
-  const thumbPath = filePath.replace(".mp3", "_thumb.jpg");
+  const baseName = path.resolve(__dirname, "..", "..", "downloads", `${safeTitle}`);
+  const mp3file = baseName + ".mp3";
+  const tmpfile = baseName + ".webm";
+  const thumb = baseName + "_thumb.jpg";
   const url = `https://www.youtube.com/watch?v=${meta.videoId}`;
-  await Promise.allSettled([fsp.unlink(filePath), fsp.unlink(thumbPath)]);
-  await fetchThumbnail(thumbPath, meta.thumbnail);
+  await Promise.allSettled([fsp.rm(mp3file), fsp.rm(thumb), fsp.rm(tmpfile)]);
   await Promise.allSettled([
-    asyncYTDL(filePath, url, { filter: "audioonly", quality: "highestaudio" }),
-    fetchThumbnail(thumbPath, meta.thumbnail),
+    asyncYTDL(tmpfile, url, { filter: "audioonly", quality: "highestaudio" }),
+    fetchThumbnail(thumb, meta.thumbnail),
   ]);
-  await convertToMp3(filePath, thumbPath, meta, lyrics);
-  await fsp.rm(filePath.replace(".mp3", ".webm"));
-  await fsp.rm(thumbPath);
-  return filePath;
+  await convertToMp3(baseName, thumb, meta, lyrics);
+  await fsp.rm(tmpfile);
+  await fsp.rm(thumb);
+  return mp3file;
 }
