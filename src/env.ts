@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(process.cwd(), "src", ".env") });
 
 const server = z.object({
   GENIUS_SECRET: z.string(),
-  NODE_ENV: z.enum(["development", "test", "production"]),
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
 // parse env
