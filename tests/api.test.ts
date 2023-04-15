@@ -2,7 +2,7 @@ import request, { Response } from "supertest";
 import { describe, expect, test } from "@jest/globals";
 
 // PORT is fixed in index.ts
-const BASE_URL = "http://localhost:5173";
+const BASE_URL = "http://localhost:6012";
 
 describe("GET /search", () => {
   test("no q param", async () => {
