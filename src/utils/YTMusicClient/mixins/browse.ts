@@ -140,7 +140,7 @@ const VideoDetails = z.object({
   author: z.string(),
   isPrivate: z.boolean(),
   isUnpluggedCorpus: z.boolean(),
-  musicVideoType: z.string(),
+  musicVideoType: z.string().optional(),
   isLiveContent: z.boolean(),
 });
 
