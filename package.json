@@ -5,7 +5,6 @@
   "description": "The server code for the MelodyBox-Client",
   "main": "src/index.ts",
   "scripts": {
-    "preinstall": "pip install ytmusicapi==0.25.0",
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "start": "node dist/index.js",
@@ -32,7 +31,6 @@
     "ffmpeg-static": "^5.1.0",
     "genius-lyrics": "^4.4.3",
     "helmet": "^6.0.1",
-    "node-calls-python": "^1.7.6",
     "ytdl-core": "^4.11.3",
     "zod": "^3.21.4"
   },
