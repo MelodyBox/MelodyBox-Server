@@ -1,24 +1,4 @@
-import { z } from "zod";
-import { Artists, Thumbs, Album } from "../parsers/common";
-
-const WatchResult = z.object({
-  tracks: z.array(
-    z.object({
-      videoId: z.string(),
-      title: z.string(),
-      length: z.string(),
-      thumbnail: Thumbs,
-      videoType: z.string(),
-      artists: Artists,
-      album: Album,
-      year: z.string(),
-    })
-  ),
-  playlistId: z.string(),
-  lyrics: z.string().default(""),
-  related: z.string(),
-});
-type WatchResult = z.infer<typeof WatchResult>;
+import { WatchResult } from "../parsers/watch";
 
 import { _YTMusic } from "../YTMusic";
 import { GConstructor, Mixin } from "./mixin.helper";
