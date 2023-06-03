@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Artists, Thumbs } from "./common";
+import { Artists, Thumbs } from "../parsers/common";
 
 export const Filter = z.enum([
   "songs",

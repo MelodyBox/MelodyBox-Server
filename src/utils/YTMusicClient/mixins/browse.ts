@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Thumbs, Artists, Album } from "./common";
+import { Thumbs, Artists, Album } from "../parsers/common";
 
 const LyricsResult = z.object({
   lyrics: z.string(),

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Artists, Thumbs, Album } from "./common";
+import { Artists, Thumbs, Album } from "../parsers/common";
 
 const WatchResult = z.object({
   tracks: z.array(
